@@ -14,7 +14,25 @@ export default defineConfig({
     // 导入别名
     alias: {
       '@': resolve(__dirname, 'src'),
-    }
+      "/images": "src/assets/images",
+    },
+  },
+  server: {
+    open: true,
+    host: '0.0.0.0',
+    cors: true,
+    // port: 3000,
+    // proxy: {
+    //   "/api": {
+    //     target: 'http://pcapi-xiaotuxian-front-devtest.itheima.net/',
+    //     changeOrigin: true,
+    //     // rewrite: (path) => path.replace(/^\/api/, ""),
+    //   }
+    // },
+    // hmr: {
+    //   overlay: true,
+    //   host: '127.0.0.1'
+    // },
   },
   css: {
     preprocessorOptions: {

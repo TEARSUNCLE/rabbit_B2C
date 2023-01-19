@@ -1,0 +1,81 @@
+.topNav {
+  background-color: #333;
+
+  .menu {
+    height: 53px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    li {
+      border-left: 2px solid #666;
+
+      a {
+        color: #cdcdcd;
+        font-size: 14px;
+
+        &:hover {
+          color: @primary-color;
+        }
+      }
+    }
+
+    li:nth-of-type(1) {
+      border-left: none;
+    }
+  }
+}
+
+.headerMenu {
+  display: flex;
+  align-items: center;
+  height: 132px;
+  position: relative;
+
+  .menu {
+    width: 820px;
+
+    li a {
+      height: 32px;
+      line-height: 32px;
+      display: block;
+    }
+  }
+
+  .search {
+    width: 170px;
+    height: 32px;
+    position: relative;
+    border-bottom: 1px solid #e7e7e7;
+  }
+
+  .cart {
+    width: 50px;
+    position: relative;
+    z-index: 600;
+
+    .buyNum {
+      background-color: #e26237;
+      border-radius: 10px;
+      padding: 0px 6px;
+      position: absolute;
+      right: 0px;
+      top: -8px;
+      color: #fff;
+    }
+  }
+
+  .layer {
+    width: 1240px;
+    background-color: #fff;
+    position: absolute;
+    left: 0;
+    top: 100px;
+    z-index: 9;
+    height: 132px;
+    overflow: hidden;
+    opacity: 1;
+    box-shadow: 0 0 5px #ccc;
+    transition: all .2s .1s;
+  }
+}
