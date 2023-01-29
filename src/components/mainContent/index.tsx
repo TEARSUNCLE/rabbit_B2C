@@ -1,7 +1,8 @@
-import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import { Carousel } from "ant-design-vue"
 import { getBannerListApi, getcategoryListApi, getHotGoodsApi, getNewGoodsApi } from "@/api/dashboard"
 import { RightOutlined } from "@ant-design/icons-vue"
+import { componentLazy } from "@/hooks/componentLazy"
 import styles from '@/components/css/main.module.less'
 
 export default defineComponent({
@@ -9,12 +10,13 @@ export default defineComponent({
   setup() {
     const bannerList = ref<any[]>([])
     const categoryList = ref<any[]>([])
-    const newGoodsList = ref<any[]>([]) // 新鲜好物
-    const hotGoodsList = ref<any[]>([]) // 人气推荐
+    // 新鲜好物
+    const newGoodsList = ref<any[]>([])
+    // 人气推荐
+    const hotGoodsList = ref<any[]>([])
     const carouselRef = ref()
     const curLayerId = ref()
-
-    const curHeight = ref()   // 当前页面高度
+    const hotGoodsRef = ref()
 
     const isShowLayer = ref<boolean>(false)
 
@@ -62,35 +64,19 @@ export default defineComponent({
       isShowLayer.value = false
     }
 
-    const handleScroll = () => {
-      window.addEventListener('scroll', () => {
-        // 350
-        if (window.scrollY) curHeight.value = window.scrollY
-      })
-    }
-
-    watch(() => curHeight.value, (newVal) => {
-      if (newVal >= 350) {
-       getHotGoods.
-      }
-    })
+    componentLazy(hotGoodsRef, getHotGoods)
 
     onMounted(() => {
       getBanner()
       getcategory()
       getNewGoods()
-      handleScroll()
-    })
-
-    onBeforeUnmount(() => {
-      // 离开组件移除监听事件
-      window.removeEventListener('scroll', () => { })
     })
 
     return {
       bannerList,
       changeBanner,
       carouselRef,
+      hotGoodsRef,
       categoryList,
       layerEnter,
       curLayerId,
@@ -121,9 +107,9 @@ export default defineComponent({
               {/* 轮播图 */}
               <Carousel autoplay ref={'carouselRef'}>
                 {bannerList && bannerList.map(item => {
-                  return <div>
+                  return <li key={item.id}>
                     <img src={item.imgUrl} alt="" />
-                  </div>
+                  </li>
                 })}
               </Carousel>
 
@@ -177,43 +163,43 @@ export default defineComponent({
                 </div>
                 }
               </div>
-
-              {/* 新鲜好物 */}
-              <div class={styles.newGoods}>
-                <div class={`pt35 pb35 flexWrap`}>
-                  <h1 class={`fs32 ml6 f400`}>新鲜好物
-                    <span class={`fs16 c-999 ml20`}>新鲜出炉 品质靠谱</span>
-                  </h1>
-                  <p class={`fs16 pr4 c-999 defaultA hand`}>查看全部 <RightOutlined /> </p>
-                </div>
-
-                <ul class={`${styles.newGoodsUl} mb20 flexWrap`}>
-                  {newGoodsList && newGoodsList.map(item => {
-                    return <li class={`${styles.newGoodsLi} hand box-hover`}>
-                      <img src={item.picture} alt="" width={306} height={306} />
-                      <p class={`oneLine fs22 pt12 pr30 pb0 pl30`}>{item.name}</p>
-                      <p class={`fs22 price textCenter`}><i class={`fs16 price`}>￥</i>{item.price}</p>
-                    </li>
-                  })}
-                </ul>
-              </div>
-
-              <div class={styles.newGoods}>
-                <h1 class={`fs32 ml6 f400 pt35 pb35`}>人气推荐
-                  <span class={`fs16 c-999 ml20`}>人气爆款 不容错过</span>
-                </h1>
-
-                <ul class={`${styles.newGoodsUl} mb20 flexWrap`}>
-                  {hotGoodsList && hotGoodsList.map(item => {
-                    return <li class={`${styles.newGoodsLi} hand box-hover textCenter`}>
-                      <img src={item.picture} alt="" width={306} height={306} />
-                      <p class={`oneLine fs22 pt12 pr30 pb0 pl30`}>{item.title}</p>
-                      <p class={`fs18 c-999 pt5`}>{item.alt}</p>
-                    </li>
-                  })}
-                </ul>
-              </div>
             </ul>
+
+            {/* 新鲜好物 */}
+            <div class={styles.newGoods}>
+              <div class={`pt35 pb35 flexWrap`}>
+                <h1 class={`fs32 ml6 f400`}>新鲜好物
+                  <span class={`fs16 c-999 ml20`}>新鲜出炉 品质靠谱</span>
+                </h1>
+                <p class={`fs16 pr4 c-999 defaultA hand`}>查看全部 <RightOutlined /> </p>
+              </div>
+
+              <ul class={`${styles.newGoodsUl} mb20 flexWrap`}>
+                {newGoodsList && newGoodsList.map(item => {
+                  return <li class={`${styles.newGoodsLi} hand box-hover`} >
+                    <img src={item.picture} alt="" width={306} height={306} />
+                    <p class={`oneLine fs22 pt12 pr30 pb0 pl30`}>{item.name}</p>
+                    <p class={`fs22 price textCenter`}><i class={`fs16 price`}>￥</i>{item.price}</p>
+                  </li>
+                })}
+              </ul>
+            </div>
+
+            <div class={styles.newGoods} ref={`hotGoodsRef`}>
+              <h1 class={`fs32 ml6 f400 pt35 pb35`}>人气推荐
+                <span class={`fs16 c-999 ml20`}>人气爆款 不容错过</span>
+              </h1>
+
+              <ul class={`${styles.newGoodsUl} mb20 flexWrap`}>
+                {hotGoodsList && hotGoodsList.map(item => {
+                  return <li class={`${styles.newGoodsLi} hand box-hover textCenter`}>
+                    <img src={item.picture} alt="" width={306} height={306} />
+                    <p class={`oneLine fs22 pt12 pr30 pb0 pl30`}>{item.title}</p>
+                    <p class={`fs18 c-999 pt5`}>{item.alt}</p>
+                  </li>
+                })}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
