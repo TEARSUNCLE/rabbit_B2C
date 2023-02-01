@@ -19,3 +19,8 @@ export const getNewGoodsApi = () => {
 export const getHotGoodsApi = () => {
   return request.get(`home/hot`)
 }
+
+/** 品牌推荐 */
+export const getBrandListApi = (params: { limit: number }) => {
+  return request.get(`home/brand`, { params })
+}
