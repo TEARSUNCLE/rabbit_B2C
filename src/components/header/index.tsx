@@ -4,7 +4,6 @@ import styles from '@/components/css/header.module.less'
 import { RouterLink, useRouter } from "vue-router"
 
 export default defineComponent({
-
   setup() {
     const useImg = ref<boolean>(false)
     const buyNUm = ref(0)
@@ -13,6 +12,7 @@ export default defineComponent({
 
     const curMenuId = ref()
     const showLayer = ref<boolean>(false)
+    const showHeaderSticky = ref<boolean>(false)
 
     // 鼠标移入移出
     const mouseenterImg = () => useImg.value = true
@@ -51,6 +51,11 @@ export default defineComponent({
       } else {}
     }
 
+    window.addEventListener('scroll', () => {
+      // 75
+      window.scrollY > 75 ? showHeaderSticky.value = true : showHeaderSticky.value = false
+    })
+
     onMounted(() => {
       getcategory()
     })
@@ -67,6 +72,7 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
+      showHeaderSticky,
     }
   },
 
@@ -82,6 +88,7 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
+      showHeaderSticky
     } = this
     return (
       <>
@@ -104,13 +111,13 @@ export default defineComponent({
         </div>
 
         <div class={`container`}>
-          <div class={styles.headerMenu} onMouseleave={categoryLeave}>
+          <div class={`${styles.headerMenu}`} onMouseleave={categoryLeave}>
             <h1>
               <RouterLink to={'/'}>
                 <img src="/images/logo.png" width={200} class={`pb15`} alt="logo" title="小兔鲜儿" />
               </RouterLink>
             </h1>
-            <ul class={`flexWrap pl10 pr20 ${styles.menu}`}>
+            <ul class={`flexBox pl10 pr20 flexAroundX aiCenter ${styles.menu}`}>
               {categoryList && categoryList.map(item => {
                 return <li key={item.id} class={`fs16`}>
                   <a
