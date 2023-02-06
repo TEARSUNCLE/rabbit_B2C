@@ -23,6 +23,8 @@ export default defineComponent({
 
     const curPanel = ref(null)
 
+    const curCarousel = ref(1)
+
     const isPanelPrev = ref<boolean>(true)
     const isPanelNext = ref<boolean>(false)
     const isShowLayer = ref<boolean>(false)
@@ -60,10 +62,12 @@ export default defineComponent({
       const { data } = await getBrandListApi({ limit })
       if (data.code == 1) {
         if (limit === 10) {
-          for (let i = 0; i < data.result.length; i += 5) {
-            brandList.value.push({ id: Math.floor(Math.random() * 100), imgs: data.result.slice(i, i + 5) })
-            curPanel.value = brandList.value[0].id
-          }
+          // for (let i = 0; i < data.result.length; i += 5) {
+          //   brandList.value.push({ id: Math.floor(Math.random() * 100), imgs: data.result.slice(i, i + 5) })
+          //   curPanel.value = brandList.value[0].id
+          // }
+          brandList.value = data.result
+          curPanel.value = brandList.value[0].id
         } else {
           categoryList.value.push({
             id: '2367407',
@@ -101,11 +105,13 @@ export default defineComponent({
 
     // 品牌切换
     const changePanel = (type: string) => {
-      const index = brandList.value.findIndex(item => item.id === curPanel.value)
+      const el = document.querySelector('.panelBox') as HTMLBodyElement
       if (type === 'next') {
-        curPanel.value = brandList.value[index + 1].id
+        curCarousel.value += 1
+        el.style.transform = `translateX(-${1}00%)`
       } else {
-        curPanel.value = brandList.value[index - 1].id
+        curCarousel.value -= 1
+        el.style.transform = `translateX(-${0}00%)`
       }
     }
 
@@ -122,14 +128,10 @@ export default defineComponent({
     watch(() => categoryList.value, (newVal) => {
       if (newVal.length) getBrandList()
     })
-    watch(() => curPanel.value, (newVal) => {
+    watch(() => curCarousel.value, (newVal) => {
       if (newVal) {
-        brandList.value.map((item, index) => {
-          if (newVal === item.id) {
-            index === 0 ? isPanelPrev.value = true : isPanelPrev.value = false
-            index + 1 === brandList.value.length ? isPanelNext.value = true : isPanelNext.value = false
-          }
-        })
+        newVal === 1 ? isPanelPrev.value = true : isPanelPrev.value = false
+        newVal === brandList.value.length / 5 ? isPanelNext.value = true : isPanelNext.value = false
       }
     })
 
@@ -151,6 +153,7 @@ export default defineComponent({
       changePanel,
       isPanelPrev,
       isPanelNext,
+      curCarousel,
     }
   },
 
@@ -166,10 +169,11 @@ export default defineComponent({
       newGoodsList,
       hotGoodsList,
       brandList,
-      curPanel,
+      // curPanel,
       changePanel,
       isPanelPrev,
-      isPanelNext
+      isPanelNext,
+      // curCarousel,
     } = this
     return (
       <div class={styles.main}>
@@ -185,18 +189,12 @@ export default defineComponent({
                 })}
               </Carousel>
 
-              <img
-                src="/images/arrow-left.png"
-                alt=""
-                width={44}
-                class={`${styles.arrowLeft} hand`}
-                onClick={() => changeBanner('prev')} />
-              <img
-                src="/images/arrow-right.png"
-                alt=""
-                width={44}
-                class={`${styles.arrowRight} hand`}
-                onClick={() => changeBanner('next')} />
+              <p class={`${styles.arrowLeft} hand flexBox flexcenterX aiCenter`} onClick={() => changeBanner('prev')}>
+                <LeftOutlined style={{ fontSize: '16px', color: '#fff' }} />
+              </p>
+              <p class={`${styles.arrowRight} hand flexBox flexcenterX aiCenter`} onClick={() => changeBanner('next')}>
+                <RightOutlined style={{ fontSize: '16px', color: '#fff' }} />
+              </p>
 
               <div class={styles.homeCategory} onMouseleave={() => layerLeave()}>
                 <div class={styles.menu}>
@@ -292,39 +290,39 @@ export default defineComponent({
 
         <div class={`${styles.panel} mb20 flexWrap`} ref={`panelRef`}>
           <div class={`container`}>
-            <div class={`flexWrap`}>
-              <h1 class={`fs32 ml6 f400 pt35 pb35`}>热门品牌
-                <span class={`fs16 c-999 ml20`}>国际经典 品质保证</span>
-              </h1>
-              <div class={`flexBox`}>
-                <Button
-                  icon={<LeftOutlined
-                    style={{ width: '12px', height: '13px', color: '#fff' }} />}
-                  style={{ width: '20px', height: '20px', backgroundColor: isPanelPrev ? '#ccc' : '#27ba9b' }}
-                  class={'flexBox flexcenterX aiCenter mr5'}
-                  disabled={isPanelPrev}
-                  onClick={() => changePanel('prev')}
-                />
-                <Button
-                  icon={<RightOutlined
-                    style={{ width: '12px', height: '13px', color: '#fff' }} />}
-                  style={{ width: '20px', height: '20px', backgroundColor: isPanelNext ? '#ccc' : '#27ba9b' }}
-                  class={'flexBox flexcenterX aiCenter'}
-                  disabled={isPanelNext}
-                  onClick={() => changePanel('next')}
-                />
+            <div class={styles.panelBox}>
+              <div class={`flexWrap`} >
+                <h1 class={`fs32 ml6 f400 pt35 pb35`}>热门品牌
+                  <span class={`fs16 c-999 ml20`}>国际经典 品质保证</span>
+                </h1>
+                <div class={`flexBox`}>
+                  <Button
+                    icon={<LeftOutlined
+                      style={{ width: '12px', height: '13px', color: '#fff' }} />}
+                    style={{ width: '20px', height: '20px', backgroundColor: isPanelPrev ? '#ccc' : '#27ba9b' }}
+                    class={'flexBox flexcenterX aiCenter mr5'}
+                    disabled={isPanelPrev}
+                    onClick={() => changePanel('prev')}
+                  />
+                  <Button
+                    icon={<RightOutlined
+                      style={{ width: '12px', height: '13px', color: '#fff' }} />}
+                    style={{ width: '20px', height: '20px', backgroundColor: isPanelNext ? '#ccc' : '#27ba9b' }}
+                    class={'flexBox flexcenterX aiCenter'}
+                    disabled={isPanelNext}
+                    onClick={() => changePanel('next')}
+                  />
+                </div>
               </div>
 
-            </div>
-            <ul class={`flexWrap mb40 panelUl`}>
-              {brandList && brandList.map(item => {
-                return item.id === curPanel && item.imgs.map(key => {
-                  return <li key={key.id} class={`${styles.panelLi} hand`}>
+              <ul class={`${styles.panelUl} flexBox mb30 panelBox`}>
+                {brandList && brandList.map(key => {
+                  return <li key={key.id} class={`${styles.panelLi} hand mr10`}>
                     <img src={key.picture} alt="" width={240} height={305} />
                   </li>
-                })
-              })}
-            </ul>
+                })}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
