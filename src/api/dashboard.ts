@@ -24,3 +24,13 @@ export const getHotGoodsApi = () => {
 export const getBrandListApi = (params: { limit: number }) => {
   return request.get(`home/brand`, { params })
 }
+
+/** 商品区 */
+export const getGoodsListApi = () => {
+  return request.get(`home/goods`)
+}
+
+/** 最新专题 */
+export const getSpecialListApi = () => {
+  return request.get(`home/special`)
+}

@@ -1,10 +1,18 @@
-import { defineComponent, onMounted, ref, watch } from "vue"
+import { defineComponent, onMounted, reactive, ref, watch } from "vue"
 import { Button, Carousel } from "ant-design-vue"
-import { getBannerListApi, getBrandListApi, getcategoryListApi, getHotGoodsApi, getNewGoodsApi } from "@/api/dashboard"
+import { getBannerListApi, getBrandListApi, getcategoryListApi, getGoodsListApi, getHotGoodsApi, getNewGoodsApi, getSpecialListApi } from "@/api/dashboard"
 import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue"
 import { componentLazy } from "@/hooks/componentLazy"
 import styles from '@/components/css/main.module.less'
 
+interface goodsType {
+  id: string,
+  name: string,
+  picture: string,
+  saleInfo: string,
+  children: [],
+  goods: []
+}
 export default defineComponent({
 
   setup() {
@@ -16,13 +24,23 @@ export default defineComponent({
     const hotGoodsList = ref<any[]>([])
     // 品牌推荐
     const brandList = ref<any[]>([])
+    // 商品列表区
+    const goodsList = reactive({
+      family: [] as goodsType[],
+      food: [] as goodsType[],
+      clothes: [] as goodsType[],
+      motherBaby: [] as goodsType[]
+    })
+    // 最新专题
+    const special = ref<any[]>([])
+
     const carouselRef = ref()
     const curLayerId = ref()
     const hotGoodsRef = ref()
     const panelRef = ref()
-
-    const curPanel = ref(null)
-
+    const goodsListRef = ref()
+    const specialRef = ref()
+    // 当前轮播图页数
     const curCarousel = ref(1)
 
     const isPanelPrev = ref<boolean>(true)
@@ -57,17 +75,30 @@ export default defineComponent({
       }
     }
 
+    const getGoodsList = async () => {
+      const { data } = await getGoodsListApi()
+      if (data.code == 1) {
+        goodsList.family.push(data.result[0])
+        goodsList.food.push(data.result[1])
+        goodsList.clothes.push(data.result[2])
+        goodsList.motherBaby.push(data.result[3])
+      }
+    }
+
+    const getSpecialList = async () => {
+      const { data } = await getSpecialListApi()
+      if (data.code == 1) {
+        special.value = data.result
+      }
+    }
+
+
     // 品牌推荐
     const getBrandList = async (limit = 6) => {
       const { data } = await getBrandListApi({ limit })
       if (data.code == 1) {
         if (limit === 10) {
-          // for (let i = 0; i < data.result.length; i += 5) {
-          //   brandList.value.push({ id: Math.floor(Math.random() * 100), imgs: data.result.slice(i, i + 5) })
-          //   curPanel.value = brandList.value[0].id
-          // }
           brandList.value = data.result
-          curPanel.value = brandList.value[0].id
         } else {
           categoryList.value.push({
             id: '2367407',
@@ -118,6 +149,8 @@ export default defineComponent({
     // 组件数据lazy
     componentLazy(hotGoodsRef, getHotGoods)
     componentLazy(panelRef, getBrandList, 10)
+    componentLazy(goodsListRef, getGoodsList)
+    componentLazy(specialRef, getSpecialList)
 
     onMounted(() => {
       getBanner()
@@ -140,6 +173,8 @@ export default defineComponent({
       changeBanner,
       carouselRef,
       hotGoodsRef,
+      goodsListRef,
+      specialRef,
       panelRef,
       categoryList,
       layerEnter,
@@ -149,11 +184,10 @@ export default defineComponent({
       newGoodsList,
       hotGoodsList,
       brandList,
-      curPanel,
       changePanel,
       isPanelPrev,
       isPanelNext,
-      curCarousel,
+      goodsList,
     }
   },
 
@@ -169,11 +203,10 @@ export default defineComponent({
       newGoodsList,
       hotGoodsList,
       brandList,
-      // curPanel,
       changePanel,
       isPanelPrev,
       isPanelNext,
-      // curCarousel,
+      goodsList,
     } = this
     return (
       <div class={styles.main}>
@@ -255,7 +288,10 @@ export default defineComponent({
               <h1 class={`fs32 ml6 f400`}>新鲜好物
                 <span class={`fs16 c-999 ml20`}>新鲜出炉 品质靠谱</span>
               </h1>
-              <p class={`fs16 pr4 c-999 defaultA hand`}>查看全部 <RightOutlined /> </p>
+              <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand`}>
+                <span>查看全部</span>
+                <RightOutlined />
+              </a>
             </div>
 
             <ul class={`${styles.newGoodsUl} mb20 flexWrap`}>
@@ -288,7 +324,7 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class={`${styles.panel} mb20 flexWrap`} ref={`panelRef`}>
+        <div class={`${styles.panel} mb flexWrap`} ref={`panelRef`}>
           <div class={`container`}>
             <div class={styles.panelBox}>
               <div class={`flexWrap`} >
@@ -322,6 +358,263 @@ export default defineComponent({
                   </li>
                 })}
               </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* 居家 */}
+        <div class={styles.product} ref={`goodsListRef`}>
+          <div class={`container`}>
+            <div class={`${styles.head} pt40 pb40`}>
+              <div class={`flexWrap`}>
+                <h3 class={`fs32 f400 ml6`}>居家</h3>
+                <ul class={`flexWrap`}>
+                  {goodsList.family && goodsList.family.map(item => {
+                    return <li key={item.id} class={`flexWrap mr80`}>
+                      {item.children && item.children.slice(0, 4).map(key => {
+                        return <a href="Javascript:;" class={`pt2 pb2 pl12 pr12 fs16`}>{key.name}</a>
+                      })}
+                    </li>
+                  })}
+                  <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                    <span>查看全部</span>
+                    <RightOutlined />
+                  </a>
+                </ul>
+              </div>
+            </div>
+            {/* 居家-商品图 */}
+            <ul class={styles.goods}>
+              {goodsList.family && goodsList.family.map(item => {
+                return <li key={item.id} class={`flexBox`}>
+                  <div class={styles.leftBox}>
+                    <a href="javascript:;" class={`block mr10`}>
+                      <img src={item.picture} alt="" />
+                      <strong class={`${styles.label} flexBox c-fff fs18 f400`}>
+                        <span>{item.name + '馆'}</span>
+                        <span>{item.saleInfo}</span>
+                      </strong>
+                    </a>
+                  </div>
+                  <ul class={`${styles.goodsList} flexBox flexWrap2`}>
+                    {item.goods && item.goods.map(key => {
+                      return <li key={key.id} class={`mr10 mb10`}>
+                        <div class={`pt10 pb10 pl30 pr30`}>
+                          <a href="javascript:;" class={`${styles.goodsA} block`}>
+                            <img src={key.picture} alt="" />
+                          </a>
+                          <p class={`${styles.name} twoLine mt6 pb10 fs16`}>{key.name}</p>
+                          <p class={`${styles.desc} oneLine c-666 mt6 fs16`}>{key.desc}</p>
+                          <p class={`price mt6 fs20`}>{'￥' + key.price}</p>
+
+                          <div class={`${styles.extra} flexBox flexcenterX`}>
+                            <a href="javascript:;" class={`c-fff block mr12 textCenter`}>
+                              <span class={`block fs18 mt5 mb3`}>找相似</span>
+                              <span>发现更多宝贝 ></span>
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                    })}
+                  </ul>
+                </li>
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {/* 美食 */}
+        <div class={styles.product}>
+          <div class={`container`}>
+            <div class={`${styles.head} pt40 pb40`}>
+              <div class={`flexWrap`}>
+                <h3 class={`fs32 f400 ml6`}>美食</h3>
+                <ul class={`flexWrap`}>
+                  {goodsList.food && goodsList.food.map(item => {
+                    return <li key={item.id} class={`flexWrap mr80`}>
+                      {item.children && item.children.slice(0, 4).map(key => {
+                        return <a href="Javascript:;" class={`pt2 pb2 pl12 pr12 fs16`}>{key.name}</a>
+                      })}
+                    </li>
+                  })}
+                  <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                    <span>查看全部</span>
+                    <RightOutlined />
+                  </a>
+                </ul>
+              </div>
+            </div>
+            {/* 美食-商品图 */}
+            <ul class={styles.goods}>
+              {goodsList.food && goodsList.food.map(item => {
+                return <li key={item.id} class={`flexBox`}>
+                  <div class={styles.leftBox}>
+                    <a href="javascript:;" class={`block mr10`}>
+                      <img src={item.picture} alt="" />
+                      <strong class={`${styles.label} flexBox c-fff fs18 f400`}>
+                        <span>{item.name + '馆'}</span>
+                        <span>{item.saleInfo}</span>
+                      </strong>
+                    </a>
+                  </div>
+                  <ul class={`${styles.goodsList} flexBox flexWrap2`}>
+                    {item.goods && item.goods.map(key => {
+                      return <li key={key.id} class={`mr10 mb10`}>
+                        <div class={`pt10 pb10 pl30 pr30`}>
+                          <a href="javascript:;" class={`${styles.goodsA} block`}>
+                            <img src={key.picture} alt="" />
+                          </a>
+                          <p class={`${styles.name} twoLine mt6 pb10 fs16`}>{key.name}</p>
+                          <p class={`${styles.desc} oneLine c-666 mt6 fs16`}>{key.desc}</p>
+                          <p class={`price mt6 fs20`}>{'￥' + key.price}</p>
+
+                          <div class={`${styles.extra} flexBox flexcenterX`}>
+                            <a href="javascript:;" class={`c-fff block mr12 textCenter`}>
+                              <span class={`block fs18 mt5 mb3`}>找相似</span>
+                              <span>发现更多宝贝 ></span>
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                    })}
+                  </ul>
+                </li>
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {/* 服饰 */}
+        <div class={styles.product}>
+          <div class={`container`}>
+            <div class={`${styles.head} pt40 pb40`}>
+              <div class={`flexWrap`}>
+                <h3 class={`fs32 f400 ml6`}>服饰</h3>
+                <ul class={`flexWrap`}>
+                  {goodsList.clothes && goodsList.clothes.map(item => {
+                    return <li key={item.id} class={`flexWrap mr80`}>
+                      {item.children && item.children.slice(0, 4).map(key => {
+                        return <a href="Javascript:;" class={`pt2 pb2 pl12 pr12 fs16`}>{key.name}</a>
+                      })}
+                    </li>
+                  })}
+                  <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                    <span>查看全部</span>
+                    <RightOutlined />
+                  </a>
+                </ul>
+              </div>
+            </div>
+            {/* 服饰-商品图 */}
+            <ul class={styles.goods}>
+              {goodsList.clothes && goodsList.clothes.map(item => {
+                return <li key={item.id} class={`flexBox`}>
+                  <div class={styles.leftBox}>
+                    <a href="javascript:;" class={`block mr10`}>
+                      <img src={item.picture} alt="" />
+                      <strong class={`${styles.label} flexBox c-fff fs18 f400`}>
+                        <span>{item.name + '馆'}</span>
+                        <span>{item.saleInfo}</span>
+                      </strong>
+                    </a>
+                  </div>
+                  <ul class={`${styles.goodsList} flexBox flexWrap2`}>
+                    {item.goods && item.goods.map(key => {
+                      return <li key={key.id} class={`mr10 mb10`}>
+                        <div class={`pt10 pb10 pl30 pr30`}>
+                          <a href="javascript:;" class={`${styles.goodsA} block`}>
+                            <img src={key.picture} alt="" />
+                          </a>
+                          <p class={`${styles.name} twoLine mt6 pb10 fs16`}>{key.name}</p>
+                          <p class={`${styles.desc} oneLine c-666 mt6 fs16`}>{key.desc}</p>
+                          <p class={`price mt6 fs20`}>{'￥' + key.price}</p>
+
+                          <div class={`${styles.extra} flexBox flexcenterX`}>
+                            <a href="javascript:;" class={`c-fff block mr12 textCenter`}>
+                              <span class={`block fs18 mt5 mb3`}>找相似</span>
+                              <span>发现更多宝贝 ></span>
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                    })}
+                  </ul>
+                </li>
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {/* 母婴 */}
+        <div class={styles.product}>
+          <div class={`container`}>
+            <div class={`${styles.head} pt40 pb40`}>
+              <div class={`flexWrap`}>
+                <h3 class={`fs32 f400 ml6`}>母婴</h3>
+                <ul class={`flexWrap`}>
+                  {goodsList.motherBaby && goodsList.motherBaby.map(item => {
+                    return <li key={item.id} class={`flexWrap mr80`}>
+                      {item.children && item.children.slice(0, 4).map(key => {
+                        return <a href="Javascript:;" class={`pt2 pb2 pl12 pr12 fs16`}>{key.name}</a>
+                      })}
+                    </li>
+                  })}
+                  <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                    <span>查看全部</span>
+                    <RightOutlined />
+                  </a>
+                </ul>
+              </div>
+            </div>
+            {/* 母婴-商品图 */}
+            <ul class={styles.goods}>
+              {goodsList.motherBaby && goodsList.motherBaby.map(item => {
+                return <li key={item.id} class={`flexBox`}>
+                  <div class={styles.leftBox}>
+                    <a href="javascript:;" class={`block mr10`}>
+                      <img src={item.picture} alt="" />
+                      <strong class={`${styles.label} flexBox c-fff fs18 f400`}>
+                        <span>{item.name + '馆'}</span>
+                        <span>{item.saleInfo}</span>
+                      </strong>
+                    </a>
+                  </div>
+                  <ul class={`${styles.goodsList} flexBox flexWrap2`}>
+                    {item.goods && item.goods.map(key => {
+                      return <li key={key.id} class={`mr10 mb10`}>
+                        <div class={`pt10 pb10 pl30 pr30`}>
+                          <a href="javascript:;" class={`${styles.goodsA} block`}>
+                            <img src={key.picture} alt="" />
+                          </a>
+                          <p class={`${styles.name} twoLine mt6 pb10 fs16`}>{key.name}</p>
+                          <p class={`${styles.desc} oneLine c-666 mt6 fs16`}>{key.desc}</p>
+                          <p class={`price mt6 fs20`}>{'￥' + key.price}</p>
+
+                          <div class={`${styles.extra} flexBox flexcenterX`}>
+                            <a href="javascript:;" class={`c-fff block mr12 textCenter`}>
+                              <span class={`block fs18 mt5 mb3`}>找相似</span>
+                              <span>发现更多宝贝 ></span>
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                    })}
+                  </ul>
+                </li>
+              })}
+            </ul>
+          </div>
+        </div>
+
+        {/* 最新专题 */}
+        <div class={styles.special} ref={`specialRef`}>
+          <div class={`container`}>
+            <div class={`pt40 pb40 flexWrap`}>
+              <h3 class={`fs32 ml6 f400`}>最新专题</h3>
+              <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                <span>查看全部</span>
+                <RightOutlined />
+              </a>
             </div>
           </div>
         </div>
