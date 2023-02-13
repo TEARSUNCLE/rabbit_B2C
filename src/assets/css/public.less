@@ -196,6 +196,10 @@
   justify-content: space-around;
 }
 
+.flexBetweenX {
+  justify-content: space-between;
+}
+
 .aiCenter {
   align-items: center;
 }
@@ -431,6 +435,7 @@
     border-bottom: 1px solid @primary-color;
   }
 }
+
 .defaultA {
   &:hover {
     color: @primary-color;
@@ -445,11 +450,12 @@
 .box-hover {
   -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
   transition: all 250ms cubic-bezier(.02, .01, .47, 1);
-    &:hover {
-      box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15);
-      transform: translate(0,-5px);
-      transition-delay: 0s !important;
-    }
+
+  &:hover {
+    box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15);
+    transform: translate(0, -3px);
+    transition-delay: 0s !important;
+  }
 }
 
 .commonGradient {

@@ -1,5 +1,5 @@
 import { getcategoryListApi } from "@/api/dashboard"
-import { defineComponent, onMounted, ref } from "vue"
+import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
 import styles from '@/components/css/header.module.less'
 import { RouterLink, useRouter } from "vue-router"
 
@@ -12,7 +12,6 @@ export default defineComponent({
 
     const curMenuId = ref()
     const showLayer = ref<boolean>(false)
-    const showHeaderSticky = ref<boolean>(false)
 
     // 鼠标移入移出
     const mouseenterImg = () => useImg.value = true
@@ -48,16 +47,32 @@ export default defineComponent({
     const categoryClick = (row: { id: string, name: string }) => {
       if (row.id === '0') {
         router.push('/')
-      } else {}
+      } else { }
     }
 
-    window.addEventListener('scroll', () => {
-      // 75
-      window.scrollY > 75 ? showHeaderSticky.value = true : showHeaderSticky.value = false
-    })
+    const getScroll = () => {
+      window.addEventListener('scroll', () => {
+        const el = document.querySelector('#showHeaderSticky')
+        if (window.scrollY > 75) {
+          el?.classList.add(styles.show)
+        } else {
+          el?.classList.remove(styles.show)
+        }
+      })
+    }
+
+    const clearScroll = () => {
+      window.removeEventListener('scroll', getScroll)
+    }
 
     onMounted(() => {
       getcategory()
+      getScroll()
+    })
+
+    // 页面销毁
+    onBeforeUnmount(() => {
+      clearScroll()
     })
 
     return {
@@ -72,7 +87,6 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
-      showHeaderSticky,
     }
   },
 
@@ -88,7 +102,6 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
-      showHeaderSticky
     } = this
     return (
       <>
@@ -110,7 +123,8 @@ export default defineComponent({
           </div>
         </div>
 
-        <div class={`container`}>
+        {/* 菜单吸顶 */}
+        <div class={`${styles.headerSticky} container`} id="showHeaderSticky">
           <div class={`${styles.headerMenu}`} onMouseleave={categoryLeave}>
             <h1>
               <RouterLink to={'/'}>
@@ -124,7 +138,56 @@ export default defineComponent({
                     href="#"
                     class={`defaultABottom`}
                     onMouseenter={() => categoryEnter(item.id)}
-                    onClick={() => categoryClick(item) }
+                    onClick={() => categoryClick(item)}
+                  >{item.name}</a>
+                </li>
+              })}
+            </ul>
+
+            <div class={`flexBox aiCenter ${styles.search}`}>
+              <img src="/images/magnifier.png" width={20} alt="" />
+              <input type="text" placeholder="搜一搜" style={{ border: 'none' }} class={`pl3`} />
+            </div>
+            <div class={`textCenter ${styles.cart}`}>
+              <a href="#">
+                <img src="/images/cart.png" width={22} alt="" />
+                <span class={`fs12 ${styles.buyNum}`}>{buyNUm}</span>
+              </a>
+            </div>
+
+            {showLayer && <div class={`${styles.layer} flexBox aiCenter`}>
+              <ul class={`flexBox aiCenter pl70 pr70`}>
+                {categoryList && categoryList.map(item => {
+                  return (item.children && item.id !== 0 && item.id === curMenuId) && item.children.map(goods => {
+                    return <li key={goods.id} class={`fs16 textCenter`} style={{ width: '110px' }}>
+                      <a href="#" class={`defaultA`}>
+                        <img src={goods.picture} alt="" class={`defaultImg`} />
+                        <p class={`pt10`}>{goods.name}</p>
+                      </a>
+                    </li>
+                  })
+                })}
+              </ul>
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class={`${styles.headerBox} container`}>
+          <div class={`${styles.headerMenu}`} onMouseleave={categoryLeave}>
+            <h1>
+              <RouterLink to={'/'}>
+                <img src="/images/logo.png" width={200} class={`pb15`} alt="logo" title="小兔鲜儿" />
+              </RouterLink>
+            </h1>
+            <ul class={`flexBox pl10 pr20 flexAroundX aiCenter ${styles.menu}`}>
+              {categoryList && categoryList.map(item => {
+                return <li key={item.id} class={`fs16`}>
+                  <a
+                    href="#"
+                    class={`defaultABottom`}
+                    onMouseenter={() => categoryEnter(item.id)}
+                    onClick={() => categoryClick(item)}
                   >{item.name}</a>
                 </li>
               })}

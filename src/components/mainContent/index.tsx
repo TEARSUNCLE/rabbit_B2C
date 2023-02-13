@@ -1,7 +1,7 @@
 import { defineComponent, onMounted, reactive, ref, watch } from "vue"
 import { Button, Carousel } from "ant-design-vue"
 import { getBannerListApi, getBrandListApi, getcategoryListApi, getGoodsListApi, getHotGoodsApi, getNewGoodsApi, getSpecialListApi } from "@/api/dashboard"
-import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue"
+import { EyeOutlined, HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons-vue"
 import { componentLazy } from "@/hooks/componentLazy"
 import styles from '@/components/css/main.module.less'
 
@@ -32,7 +32,7 @@ export default defineComponent({
       motherBaby: [] as goodsType[]
     })
     // 最新专题
-    const special = ref<any[]>([])
+    const specialList = ref<any[]>([])
 
     const carouselRef = ref()
     const curLayerId = ref()
@@ -88,7 +88,7 @@ export default defineComponent({
     const getSpecialList = async () => {
       const { data } = await getSpecialListApi()
       if (data.code == 1) {
-        special.value = data.result
+        specialList.value = data.result
       }
     }
 
@@ -188,6 +188,7 @@ export default defineComponent({
       isPanelPrev,
       isPanelNext,
       goodsList,
+      specialList,
     }
   },
 
@@ -207,6 +208,7 @@ export default defineComponent({
       isPanelPrev,
       isPanelNext,
       goodsList,
+      specialList,
     } = this
     return (
       <div class={styles.main}>
@@ -615,6 +617,45 @@ export default defineComponent({
                 <span>查看全部</span>
                 <RightOutlined />
               </a>
+            </div>
+            <div class={`${styles.specialList} pb20 flexBox flexBetweenX`}>
+              {specialList && specialList.map(item => {
+                return <div key={item.id} class={`${styles.specialItem} box-hover`}>
+                  <a href="javascript:;" class={`block`}>
+                    <img src={item.cover} alt="" />
+                    <div>
+                      <p class={`${styles.title} pl16`}>
+                        <span class={`c-fff fs22 block oneLine`}>{item.title}</span>
+                        <span class={`c-999 fs18 block oneLine`}>{item.summary}</span>
+                      </p>
+                      <p class={`${styles.price} price bg-ff pt4 pr8 pb4 pl7`}>￥{item.lowestPrice}起</p>
+                    </div>
+                  </a>
+                  <div class={`pl20 pr20 pt22 fs16 flexWrap`}>
+                    <p>
+                      <span>
+                        <HeartOutlined
+                          style={{ fontSize: '15px', color: '#999', paddingRight: '5px' }} />
+                        {item.collectNum}
+                      </span>
+                      <span
+                        class={`pl70`}>
+                        <EyeOutlined
+                          style={{ fontSize: '15px', color: '#999', paddingRight: '5px' }} />
+                        {item.viewNum}
+                      </span>
+                    </p>
+                    <p class={`flexBox aiCenter`}>
+                      <svg-icon
+                        iconName={`icon-BAI-pinglun`}
+                        color={`#999`}
+                        className={`pr3`}
+                        fontSize={22} />
+                      <span>{item.replyNum}</span>
+                    </p>
+                  </div>
+                </div>
+              })}
             </div>
           </div>
         </div>
