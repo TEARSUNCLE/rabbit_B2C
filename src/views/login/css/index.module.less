@@ -1,0 +1,139 @@
+.loginBox {
+  :global {
+    header {
+      border-bottom: 1px solid #e4e4e4;
+    }
+
+    .logo {
+      width: 200px;
+
+      a {
+        display: block;
+        height: 132px;
+        line-height: 132px;
+        width: 100%;
+
+        img {
+          width: 100%;
+        }
+      }
+    }
+
+    .subTitle {
+      flex: 1;
+    }
+
+    .entry {
+      width: 130px;
+    }
+
+    .loginSection {
+      background: url('@/assets/images/login-bg.png') no-repeat 50%/cover;
+      height: 488px;
+      position: relative;
+
+      .wrapper {
+        width: 380px;
+        min-height: 400px;
+        position: absolute;
+        left: 50%;
+        top: 54px;
+        transform: translate3d(100px, 0, 0);
+        box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+
+        nav {
+          height: 55px;
+
+          .ant-tabs-tab+.ant-tabs-tab {
+            margin-left: 156px;
+          }
+
+          .ant-tabs-nav-wrap,
+          .ant-tabs-content-holder {
+            padding: 0 40px;
+          }
+
+          .ant-tabs-ink-bar {
+            background-color: transparent;
+          }
+
+          .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+            color: @primary-color;
+            font-weight: 700;
+          }
+
+          .ant-tabs-tab-btn {
+            font-size: 18px;
+          }
+
+          .ant-input-prefix {
+            background-color: #cfcdcd;
+            padding: 0 9px;
+            color: #fff;
+          }
+
+          .ant-input-affix-wrapper {
+            padding: 0;
+            height: 36px;
+          }
+
+          .ant-input-lg {
+            font-size: 14px;
+            margin-left: 5px;
+          }
+
+          .ant-checkbox+span {
+            padding: 0 3px;
+          }
+
+          .agreeA {
+            color: #069;
+          }
+
+          .agreeP {
+            position: absolute;
+            left: 10%;
+            top: 62%;
+            color: #cf4444;
+          }
+
+          .ant-radio-button-wrapper {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background-color: @primary-color;
+          }
+
+          .code {
+            position: relative;
+
+            .sendCode {
+              position: absolute;
+              right: 1px;
+              top: 1px;
+              line-height: 34px;
+              font-size: 14px;
+              background: #f5f5f5;
+              width: 90px;
+              height: 34px;
+              z-index: 10;
+            }
+          }
+        }
+      }
+    }
+
+    .loginFooter {
+      ul li {
+        line-height: 1;
+        border-right: 1px solid #ccc;
+
+        &:last-child {
+          border: none;
+        }
+      }
+    }
+  }
+}

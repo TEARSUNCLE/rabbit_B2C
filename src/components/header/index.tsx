@@ -108,16 +108,18 @@ export default defineComponent({
         <div class={styles.topNav}>
           <div class={`container`}>
             <ul class={styles.menu}>
-              <li class={`pl15 pr15`}><a href="#">请先登录</a></li>
-              <li class={`pl15 pr15`}><a href="#">免费注册</a></li>
-              <li class={`pl15 pr15`}><a href="#">我的订单</a></li>
-              <li class={`pl15 pr15`}><a href="#">会员中心</a></li>
-              <li class={`pl15 pr15`}><a href="#">帮助中心</a></li>
-              <li class={`pl15 pr15`}><a href="#">关于我们</a></li>
-              <li class={`pl15 pr15 flexBox aiCenter`} onMouseenter={mouseenterImg} onMouseleave={mouseleaveImg}>
-                {!useImg && <img src="/images/phone.png" width={14} alt="" />}
-                {useImg && <img src="/images/phone-green.png" width={14} alt="" />}
-                <div class={`ml3`}><a href="#">手机版</a></div>
+              <li><a href="/login">请先登录</a></li>
+              <li><a href="javascript:;">免费注册</a></li>
+              <li><a href="javascript:;">我的订单</a></li>
+              <li><a href="javascript:;">会员中心</a></li>
+              <li><a href="javascript:;">帮助中心</a></li>
+              <li><a href="javascript:;">关于我们</a></li>
+              <li class={`flexBox aiCenter`} onMouseenter={mouseenterImg} onMouseleave={mouseleaveImg}>
+                <a href="javascript:;">
+                  {!useImg && <img src="/images/phone.png" width={14} alt="" class={`mr3`} />}
+                  {useImg && <img src="/images/phone-green.png" width={14} alt="" class={`mr3`} />}
+                  手机版
+                </a>
               </li>
             </ul>
           </div>

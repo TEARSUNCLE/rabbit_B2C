@@ -9,6 +9,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '首页',
     }
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/index'),
+    meta: {
+      title: '登录'
+    }
   }
 ]
 

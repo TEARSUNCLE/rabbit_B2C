@@ -7,21 +7,25 @@
     justify-content: flex-end;
     align-items: center;
 
-    li {
+    li a {
+      padding: 0 15px;
+      color: #cdcdcd;
+      line-height: 1;
+      display: inline-block;
+      font-size: 14px;
       border-left: 2px solid #666;
 
-      a {
-        color: #cdcdcd;
-        font-size: 14px;
-
-        &:hover {
-          color: @primary-color;
-        }
+      &:hover {
+        color: @primary-color;
       }
     }
 
-    li:nth-of-type(1) {
-      border-left: none;
+    li:first-child a {
+      border: none;
+    }
+
+    li :nth-last-of-type(-n + 1) a {
+      padding-right: 0px;
     }
   }
 }
