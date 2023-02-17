@@ -4,10 +4,15 @@ import { Checkbox, Form, Input, message, Space, Tabs } from "ant-design-vue"
 import styles from './css/index.module.less'
 import { Button } from "ant-design-vue/lib/radio"
 import { Rule } from "ant-design-vue/lib/form"
-import { getCodeApi } from "@/api/common"
+import { getCodeApi, loginApi } from "@/api/common"
+import { RouterLink, useRouter } from "vue-router"
+import useStore from "@/store"
+import { setToken } from "@/utils/storage"
 export default defineComponent({
 
   setup() {
+    const { user } = useStore()
+    const router = useRouter()
     const infoLink = ref([
       { id: 1, name: '关于我们' },
       { id: 2, name: '帮助中心' },
@@ -20,8 +25,8 @@ export default defineComponent({
 
     // 账号登录
     const accountLoginInfo = reactive({
-      account: '',
-      password: '',
+      account: 'xiaotuxian001',
+      password: '123456',
     })
 
     // 短信登录
@@ -113,6 +118,23 @@ export default defineComponent({
       }
     }
 
+    const handleSubmit = async () => {
+      if (accountLogin.value) {
+        const { data } = await loginApi(accountLoginInfo)
+        if (data.code == 1) {
+          const info = data.result
+          setToken(info.token)
+          delete info.token
+          user.setUserInfo(info)
+
+          router.push('/')
+          message.success('登录成功')
+        }
+      } else {
+        
+      }
+    }
+
     // 校验规则
     const rules: Record<string, Rule[]> = {
       userName: [{ required: true, validator: accountValidator, trigger: 'blur' }],
@@ -133,6 +155,7 @@ export default defineComponent({
       toggleLogin,
       accountLogin,
       sendCode,
+      handleSubmit,
     }
   },
 
@@ -149,6 +172,7 @@ export default defineComponent({
       toggleLogin,
       accountLogin,
       sendCode,
+      handleSubmit,
     } = this
     return (
       <div class={styles.loginBox}>
@@ -210,7 +234,7 @@ export default defineComponent({
                           // label="Password"
                           name="password"
                         >
-                          <Input size="large" placeholder="请输入密码" prefix={<LockOutlined />} v-model={[accountLoginInfo.password, 'value']} />
+                          <Input.Password size="large" placeholder="请输入密码" prefix={<LockOutlined />} v-model={[accountLoginInfo.password, 'value']} />
                         </Form.Item>
                       </div> :
                       <div>
@@ -232,15 +256,15 @@ export default defineComponent({
                   </Checkbox>
                   {!isChecked && <p class='agreeP fs12 mt5 mb5 ml1'> <svg-icon iconName={`icon-color-warning`} fontSize={14} /> 请勾选登录协议</p>}
                   <Space direction="vertical" style={{ width: '100%' }}>
-                    <Button class={`mt35`}>登录</Button>
+                    <Button class={`mt35`} onClick={handleSubmit}>登录</Button>
                   </Space>
                   <div class='action pt20 flexWrap'>
                     <a href="javascript:;">
                       <img src="images/qqLogin.png" alt="" />
                     </a>
                     <div>
-                      <a href="javascript:;" class='c-999 mr10 defaultA'>忘记密码</a>
-                      <a href="javascript:;" class='c-999 defaultA'>免费注册</a>
+                      <RouterLink to={''} class='c-999 mr10 defaultA'>忘记密码</RouterLink>
+                      <RouterLink to={'/register'} class='c-999 defaultA'>免费注册</RouterLink>
                     </div>
                   </div>
                 </Tabs.TabPane>

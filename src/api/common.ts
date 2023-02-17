@@ -14,3 +14,13 @@ export const codeLoginApi = (params: any) => {
 export const loginApi = (params: any) => {
   return request.post(`/login`, params)
 }
+
+/** 验证码注册-pc */
+export const registerCodeApi = (params: any) => {
+  return request.get(`/register/code`, { params })
+}
+
+/** 注册 */
+export const registerAccountApi = (params: any) => {
+  return request.post(`/register`, params)
+}

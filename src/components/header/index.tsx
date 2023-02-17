@@ -109,7 +109,7 @@ export default defineComponent({
           <div class={`container`}>
             <ul class={styles.menu}>
               <li><a href="/login">请先登录</a></li>
-              <li><a href="javascript:;">免费注册</a></li>
+              <li><a href="/register">免费注册</a></li>
               <li><a href="javascript:;">我的订单</a></li>
               <li><a href="javascript:;">会员中心</a></li>
               <li><a href="javascript:;">帮助中心</a></li>

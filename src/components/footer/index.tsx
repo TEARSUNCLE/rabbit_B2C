@@ -90,7 +90,7 @@ export default defineComponent({
               <dt class={`fs18 c-999`}>下载APP</dt>
               <div class={`flexBox`}>
                 <dd class={styles.commonDd}>
-                  <img src="images/qrcode.jpg" alt="" width={76} height={76} />
+                  <img src="images/qrcode.png" alt="" width={76} height={76} />
                 </dd>
                 <dd class={styles.commonDd} style={{ border: '0px', paddingTop: '5px' }}>
                   <span class={`block fs14`}>扫描二维码</span>

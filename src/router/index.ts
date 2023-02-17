@@ -17,6 +17,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '登录'
     }
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/register/index'),
+    meta: {
+      title: '注册'
+    }
   }
 ]
 

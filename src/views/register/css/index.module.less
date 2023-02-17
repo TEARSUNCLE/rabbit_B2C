@@ -1,0 +1,82 @@
+.registerBox {
+  background-color: #f5f5f5;
+
+  :global {
+    .register {
+      width: 100%;
+      height: 800px;
+      border-radius: 5px;
+      background-color: #fff;
+
+      .ant-form-item {
+        display: flex;
+        // align-items: center;
+      }
+
+      .ant-form-item-required {
+        padding-top: 5px;
+      }
+
+      .ant-form-item-explain-error {
+        text-align: left;
+      }
+
+      .ant-input {
+        padding: 8px 11px;
+      }
+
+      .ant-input-affix-wrapper {
+        padding: 0 11px;
+      }
+
+      .formBox {
+        position: relative;
+
+        .submit {
+          width: 310px;
+          height: 50px;
+          background: #27BA9B;
+          border-radius: 4px;
+          text-align: center;
+          line-height: 50px;
+
+          position: absolute;
+          left: 50%;
+          bottom: 0;
+          transform: translateX(-34%);
+
+          &:hover {
+            color: #fff;
+          }
+        }
+
+        .goLogin {
+          position: absolute;
+          left: 50%;
+          bottom: 13%;
+          transform: translateX(-80%);
+
+          .agreeA {
+            color: #27ba9b;
+          }
+        }
+
+        .code {
+          position: relative;
+
+          .sendCode {
+            position: absolute;
+            right: 1px;
+            top: 1px;
+            height: 38px;
+            line-height: 38px;
+            font-size: 14px;
+            background: #f5f5f5;
+            width: 90px;
+            z-index: 10;
+          }
+        }
+      }
+    }
+  }
+}
