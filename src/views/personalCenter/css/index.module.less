@@ -1,0 +1,49 @@
+.personalBox {
+  :global {
+    .memberHome {
+      width: 1000px;
+
+      .homeOverview {
+        height: 132px;
+        background: url('@/assets/images/center-bg.png') no-repeat 50%/cover;
+
+        .userMeta {
+          width: 500px;
+
+          img {
+            border-radius: 50%;
+          }
+        }
+
+        .item {
+          flex: 1;
+        }
+      }
+
+      .homePanel {
+        height: 400px;
+
+        header {
+          height: 66px;
+          border-bottom: 1px solid #f5f5f5;
+        }
+
+        .goodsItem {
+          width: 220px;
+          padding: 20px 30px;
+          transition: all .5s;
+
+          &:hover {
+            transform: translate3d(0, -3px, 0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .2);
+          }
+        }
+      }
+
+      .goodsRelevant {
+        height: 80px;
+        line-height: 80px;
+      }
+    }
+  }
+}

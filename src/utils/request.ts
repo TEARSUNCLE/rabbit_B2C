@@ -1,3 +1,5 @@
+import { getToken, hasToken } from '@/utils/storage';
+import { message } from 'ant-design-vue';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios'
 
 const baseURL = "http://pcapi-xiaotuxian-front.itheima.net/"
@@ -8,6 +10,10 @@ const request = axios.create({
 
 // 请求拦截
 request.interceptors.request.use((config: AxiosRequestConfig) => {
+  if (hasToken()) {
+    config.headers ? (config.headers.token = `${getToken()}`) : config;
+  }
+
   return config
 }, (err) => {
   console.log('请求拦截报错', err)
@@ -18,7 +24,7 @@ request.interceptors.request.use((config: AxiosRequestConfig) => {
 request.interceptors.response.use((res: AxiosResponse) => {
   return res
 }, (err) => {
-  console.log('响应拦截报错', err)
+  message.error(err.response.data.message)
   return Promise.reject(err)
 })
 

@@ -1,17 +1,22 @@
 import { getcategoryListApi } from "@/api/dashboard"
-import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from "vue"
 import styles from '@/components/css/header.module.less'
 import { RouterLink, useRouter } from "vue-router"
+import useStore from "@/store"
+import { clearToken, hasToken } from "@/utils/storage"
+import { message } from "ant-design-vue"
 
 export default defineComponent({
   setup() {
-    const useImg = ref<boolean>(false)
     const buyNUm = ref(0)
     const categoryList = ref<any[]>([])
-    const router = useRouter()
-
     const curMenuId = ref()
+
+    const useImg = ref<boolean>(false)
     const showLayer = ref<boolean>(false)
+
+    const router = useRouter()
+    const { user } = useStore()
 
     // 鼠标移入移出
     const mouseenterImg = () => useImg.value = true
@@ -65,6 +70,18 @@ export default defineComponent({
       window.removeEventListener('scroll', getScroll)
     }
 
+    const isToken = computed(() => {
+      return hasToken()
+    })
+
+    // 退出登录
+    const handleLogout = () => {
+      clearToken()
+      localStorage.removeItem('user')
+      message.success('已退出')
+      router.push('/login')
+    }
+
     onMounted(() => {
       getcategory()
       getScroll()
@@ -87,6 +104,9 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
+      user,
+      handleLogout,
+      isToken,
     }
   },
 
@@ -102,14 +122,23 @@ export default defineComponent({
       curMenuId,
       showLayer,
       categoryClick,
+      user,
+      handleLogout,
+      isToken,
     } = this
     return (
       <>
         <div class={styles.topNav}>
           <div class={`container`}>
             <ul class={styles.menu}>
-              <li><a href="/login">请先登录</a></li>
-              <li><a href="/register">免费注册</a></li>
+              {isToken ?
+                <li><a href="/member">{user.userInfo.account}</a></li> :
+                <li><a href="/login">请先登录</a></li>
+              }
+              {isToken ?
+                <li><a href="javascript:;" onClick={handleLogout}>退出登录</a></li> :
+                <li><a href="/register">免费注册</a></li>
+              }
               <li><a href="javascript:;">我的订单</a></li>
               <li><a href="javascript:;">会员中心</a></li>
               <li><a href="javascript:;">帮助中心</a></li>

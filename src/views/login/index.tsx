@@ -11,8 +11,11 @@ import { setToken } from "@/utils/storage"
 export default defineComponent({
 
   setup() {
-    const { user } = useStore()
-    const router = useRouter()
+    const ruleForm = ref<any>(null)
+
+    const isChecked = ref(true)
+    const accountLogin = ref(true)
+
     const infoLink = ref([
       { id: 1, name: '关于我们' },
       { id: 2, name: '帮助中心' },
@@ -24,30 +27,23 @@ export default defineComponent({
     ])
 
     // 账号登录
-    const accountLoginInfo = reactive({
+    const defaultData = reactive({
       account: 'xiaotuxian001',
       password: '123456',
-    })
-
-    // 短信登录
-    const messageLoginInfo = reactive({
       mobile: '13106917538',
       msg: ''
     })
 
-    const isChecked = ref(true)
-    const accountLogin = ref(true)
-
-    const onFinish = (values: any) => { }
-    const onFinishFailed = (errorInfo: any) => { }
+    const { user } = useStore()
+    const router = useRouter()
 
     // 校验集合
     const validatorObj = () => {
       const accountValidator = () => {
         const reg = /^[a-zA-Z]([-_a-zA-Z0-9]{6,20})$/
-        if (!accountLoginInfo.account) {
+        if (!defaultData.account) {
           return Promise.reject('请输入用户名')
-        } else if (!reg.test(accountLoginInfo.account)) {
+        } else if (!reg.test(defaultData.account)) {
           return Promise.reject('字母开头且6-20个字符')
         } else {
           return Promise.resolve()
@@ -56,9 +52,9 @@ export default defineComponent({
 
       const passwordValidator = () => {
         const reg = /^[a-zA-Z0-9_-]{6,20}$/
-        if (!accountLoginInfo.password) {
+        if (!defaultData.password) {
           return Promise.reject('请输入密码')
-        } else if (!reg.test(accountLoginInfo.password)) {
+        } else if (!reg.test(defaultData.password)) {
           return Promise.reject('6到20位(字母, 数字, 下划线, 减号)')
         } else {
           return Promise.resolve()
@@ -67,9 +63,9 @@ export default defineComponent({
 
       const mobileValidator = () => {
         const reg = /^1[3456789]\d{9}$/
-        if (!messageLoginInfo.mobile) {
+        if (!defaultData.mobile) {
           return Promise.reject('请输入手机号')
-        } else if (!reg.test(messageLoginInfo.mobile)) {
+        } else if (!reg.test(defaultData.mobile)) {
           return Promise.reject('请输入正确的手机号')
         } else {
           return Promise.resolve()
@@ -78,9 +74,9 @@ export default defineComponent({
 
       const msgValidator = () => {
         const reg = /^[0-9]\d{5}$/
-        if (!messageLoginInfo.msg) {
+        if (!defaultData.msg) {
           return Promise.reject('请输入验证码')
-        } else if (!reg.test(messageLoginInfo.msg)) {
+        } else if (!reg.test(defaultData.msg)) {
           return Promise.reject('请输入正确的验证码')
         } else {
           return Promise.resolve()
@@ -107,37 +103,40 @@ export default defineComponent({
 
     const sendCode = async () => {
       const reg = /^1[3456789]\d{9}$/
-      if (!messageLoginInfo.mobile) {
+      if (!defaultData.mobile) {
         return message.error('请输入手机号')
-      } else if (!reg.test(messageLoginInfo.mobile)) {
+      } else if (!reg.test(defaultData.mobile)) {
         return message.error('请输入正确的手机号')
       } else {
-        const { data } = await getCodeApi({ mobile: messageLoginInfo.mobile })
+        const { data } = await getCodeApi({ mobile: defaultData.mobile })
         if (data.code == 1) {
         }
       }
     }
 
-    const handleSubmit = async () => {
-      if (accountLogin.value) {
-        const { data } = await loginApi(accountLoginInfo)
-        if (data.code == 1) {
-          const info = data.result
-          setToken(info.token)
-          delete info.token
-          user.setUserInfo(info)
+    const handleSubmit = () => {
+      ruleForm.value.validateFields().then(async values => {
+        if (values) {
+          // 账号密码登录
+          if (accountLogin.value) {
+            const { data } = await loginApi(values)
+            if (data.code == 1) {
+              const info = data.result
+              setToken(info.token)
+              delete info.token
+              user.setUserInfo(info)
 
-          router.push('/')
-          message.success('登录成功')
+              router.push('/')
+              message.success('登录成功')
+            }
+          } else { }
         }
-      } else {
-
-      }
+      })
     }
 
     // 校验规则
     const rules: Record<string, Rule[]> = {
-      userName: [{ required: true, validator: accountValidator, trigger: 'blur' }],
+      account: [{ required: true, validator: accountValidator, trigger: 'blur' }],
       password: [{ validator: passwordValidator, trigger: 'blur' }],
       mobile: [{ validator: mobileValidator, trigger: 'blur' }],
       msg: [{ validator: msgValidator, trigger: 'blur' }],
@@ -145,10 +144,7 @@ export default defineComponent({
 
     return {
       infoLink,
-      onFinish,
-      onFinishFailed,
-      accountLoginInfo,
-      messageLoginInfo,
+      defaultData,
       rules,
       isChecked,
       checkBoxChange,
@@ -156,23 +152,22 @@ export default defineComponent({
       accountLogin,
       sendCode,
       handleSubmit,
+      ruleForm,
     }
   },
 
   render() {
     const {
       infoLink,
-      onFinish,
-      onFinishFailed,
-      accountLoginInfo,
-      messageLoginInfo,
       rules,
+      defaultData,
       checkBoxChange,
       isChecked,
       toggleLogin,
       accountLogin,
       sendCode,
       handleSubmit,
+      ruleForm,
     } = this
     return (
       <div class={styles.loginBox}>
@@ -216,34 +211,33 @@ export default defineComponent({
                     wrapperCol={{ span: 24 }}
                     style={{ maxWidth: 600 }}
                     initialValues={{ remember: true }}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
                     autoComplete="off"
                     rules={rules}
-                    key={Math.round(Math.random() * 100)}
+                    model={defaultData}
+                    ref='ruleForm'
                   >
                     {accountLogin ?
                       <div>
                         <Form.Item
                           // label="Username"
-                          name="userName"
+                          name="account"
                         >
-                          <Input size="large" placeholder="请输入用户名" prefix={<UserOutlined />} v-model={[accountLoginInfo.account, 'value']} />
+                          <Input size="large" placeholder="请输入用户名" prefix={<UserOutlined />} v-model={[defaultData.account, 'value']} />
                         </Form.Item>
                         <Form.Item
                           // label="Password"
                           name="password"
                         >
-                          <Input.Password size="large" placeholder="请输入密码" prefix={<LockOutlined />} v-model={[accountLoginInfo.password, 'value']} />
+                          <Input.Password size="large" placeholder="请输入密码" prefix={<LockOutlined />} v-model={[defaultData.password, 'value']} />
                         </Form.Item>
                       </div> :
                       <div>
                         <Form.Item name="mobile">
-                          <Input size="large" placeholder="请输入手机号" prefix={<UserOutlined />} v-model={[messageLoginInfo.mobile, 'value']} />
+                          <Input size="large" placeholder="请输入手机号" prefix={<UserOutlined />} v-model={[defaultData.mobile, 'value']} />
                         </Form.Item>
                         <Form.Item name="msg">
                           <div class='code'>
-                            <Input size="large" placeholder="请输入验证码" prefix={<SafetyCertificateOutlined />} v-model={[messageLoginInfo.msg, 'value']} />
+                            <Input size="large" placeholder="请输入验证码" prefix={<SafetyCertificateOutlined />} v-model={[defaultData.msg, 'value']} />
                             <span class='sendCode textCenter c-666 hand' onClick={sendCode}>发送验证码</span>
                           </div>
                         </Form.Item>
@@ -254,7 +248,7 @@ export default defineComponent({
                     <a href="javascript:;" class='agreeA'>《隐私条款》</a>
                     和<a href="javascript:;" class='agreeA'>《服务条款》</a>
                   </Checkbox>
-                  {!isChecked && <p class='agreeP fs12 mt5 mb5 ml1'> <svg-icon iconName={`icon-color-warning`} fontSize={14} /> 请勾选登录协议</p>}
+                  {!isChecked && <p class='agreeP fs12 mt5 mb5 ml1'> <svg-icon iconName={`icon-color-warning`} fontSize={14} color={`#fa5151`} /> 请勾选登录协议</p>}
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <Button class={`mt35`} onClick={handleSubmit}>登录</Button>
                   </Space>

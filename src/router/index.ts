@@ -25,6 +25,14 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: '注册'
     }
+  },
+  {
+    path: '/member',
+    name: 'member',
+    component: () => import('@/views/personalCenter/index'),
+    meta: {
+      title: '个人中心'
+    }
   }
 ]
 
