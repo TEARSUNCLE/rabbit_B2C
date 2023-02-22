@@ -29,9 +29,20 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/member',
     name: 'member',
-    component: () => import('@/views/personalCenter/index'),
+    component: () => import('@/views/member/personalCenter/index'),
     meta: {
       title: '个人中心'
+    },
+    children: [
+      
+    ]
+  },
+  {
+    path: '/order',
+    name: 'order',
+    component: () => import('@/views/member/order/index'),
+    meta: {
+      title: '我的订单'
     }
   }
 ]

@@ -1,13 +1,15 @@
-import { defineComponent, onMounted } from "vue"
+import { defineComponent, onMounted, ref } from "vue"
 import SideNav from "@/layout/components/SideNav"
 import styles from './css/index.module.less'
 import useStore from "@/store"
 import { RightOutlined } from "@ant-design/icons-vue"
-import { getCollectApi } from "@/api/personalCenter"
-import { collectList, footPrintList } from "@/mock"
+import { getCollectApi, getGoodsRelevantApi } from "@/api/member"
+import { collectList, footPrintList } from "@/mock/commonData"
+import { RouterView } from "vue-router"
 
 export default defineComponent({
   setup() {
+    const goodsRelevant = ref<any[]>([])
     const { user } = useStore()
 
     const getCollect = async () => {
@@ -20,19 +22,55 @@ export default defineComponent({
       if (data.code == 1) { }
     }
 
+    const getGoodsRelevant = async () => {
+      const params = {
+        id: '',
+        limit: 16
+      }
+      const { data } = await getGoodsRelevantApi(params)
+      if (data.code == 1) {
+        goodsRelevant.value = data.result
+      }
+    }
+
+    const toggleGoods = (type: number) => {
+      // 当前页
+      let index = 1
+
+      const el = document.querySelectorAll('.goodsRelevant .carousel-indicator span')
+      el.forEach((item, index) => {
+        item.classList.remove('active')
+        if (type - 1 === index) {
+          item.classList.add('active')
+        }
+      })
+
+      const indicators = document.querySelector('.goodsRelevant .carousel .goodsUl') as HTMLBodyElement
+      if (type > index) {
+        indicators.style.transform = `translateX(-${type - 1}00%)`
+      } else {
+        indicators.style.transform = `translateX(${type - 1}00%)`
+      }
+      index = type
+    }
+
     onMounted(async () => {
       // await getCollect()
+      await getGoodsRelevant()
     })
 
     return {
       user,
+      goodsRelevant,
+      toggleGoods,
     }
   },
 
   render() {
-    const { user } = this
+    const { user, goodsRelevant, toggleGoods } = this
     return (
       <>
+        <RouterView />
         <div class={styles.personalBox}>
           <SideNav v-slots={{
             content: () => (
@@ -68,7 +106,7 @@ export default defineComponent({
                   <div class='homePanel bg-ff mt20 pl20 pr20'>
                     <header class='flexWrap'>
                       <h4 class='fs22 f400'>我的收藏</h4>
-                      <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                      <a href="/" class={`fs16 pr4 c-999 defaultA hand block`}>
                         <span>查看全部</span>
                         <RightOutlined />
                       </a>
@@ -88,7 +126,7 @@ export default defineComponent({
                   <div class='homePanel bg-ff mt20 pl20 pr20'>
                     <header class='flexWrap'>
                       <h4 class='fs22 f400'>我的足迹</h4>
-                      <a href="javascript:;" class={`fs16 pr4 c-999 defaultA hand block`}>
+                      <a href="/" class={`fs16 pr4 c-999 defaultA hand block`}>
                         <span>查看全部</span>
                         <RightOutlined />
                       </a>
@@ -110,6 +148,25 @@ export default defineComponent({
                       <svg-icon iconName={`icon-xihuan`} fontSize={23} className={`mr5`} />
                       <h4 class='fs20 f400'>猜你喜欢</h4>
                     </header>
+                    <div class='carousel'>
+                      <ul class={`flexWrap goodsUl`}>
+                        {goodsRelevant && goodsRelevant.map(item => {
+                          return <li key={item.id}>
+                            <a href="javascript:;" class='goodsItem textCenter block'>
+                              <img src={item.picture} alt="" width={230} height={230} />
+                              <p class='fs16 c-666 oneLine pl40 pr40'>{item.name}</p>
+                              <p class='price fs16 mt10'>{'￥' + item.price}</p>
+                            </a>
+                          </li>
+                        })}
+                      </ul>
+                      <div class='carousel-indicator flexBox flexcenterX mt40'>
+                        <span class='active block ml6 mr6 hand' onClick={() => toggleGoods(1)}></span>
+                        <span class='block ml6 mr6 hand' onClick={() => toggleGoods(2)}></span>
+                        <span class='block ml6 mr6 hand' onClick={() => toggleGoods(3)}></span>
+                        <span class='block ml6 mr6 hand' onClick={() => toggleGoods(4)}></span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </>

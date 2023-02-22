@@ -41,8 +41,39 @@
       }
 
       .goodsRelevant {
-        height: 80px;
-        line-height: 80px;
+        min-height: 460px;
+
+        header {
+          height: 80px;
+          line-height: 80px;
+        }
+
+        .carousel {
+          position: relative;
+          overflow: hidden;
+
+          ul {
+            transition: all .5s;
+
+            li .goodsItem {
+              width: 240px;
+
+              img {
+                padding: 20px;
+              }
+            }
+          }
+
+          .carousel-indicator {
+            span {
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              background-color: #ccc;
+              
+            }
+          }
+        }
       }
     }
   }

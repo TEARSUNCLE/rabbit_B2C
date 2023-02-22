@@ -16,7 +16,7 @@ request.interceptors.request.use((config: AxiosRequestConfig) => {
 
   return config
 }, (err) => {
-  console.log('请求拦截报错', err)
+  message.error(err.response.data.message)
   return Promise.reject(err)
 })
 

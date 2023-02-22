@@ -3,12 +3,16 @@ import { defineComponent, ref } from "vue"
 import styles from '../css/SideNav.module.less'
 import HeaderComponent from "@/components/header"
 import FooterComponent from "@/components/footer"
+import { useRoute, useRouter } from "vue-router"
 
 export default defineComponent({
   setup() {
+    const router = useRouter()
+    const route = useRoute()
+
     const list = () => {
       const accountList = [
-        { title: '个人中心', key: 'center' },
+        { title: '个人中心', key: 'member' },
         { title: '消息通知', key: 'notice' },
         { title: '个人信息', key: 'info' },
         { title: '安全设置', key: 'setting' },
@@ -20,7 +24,7 @@ export default defineComponent({
       ]
 
       const payManagerList = [
-        { title: '我的订单', key: '' },
+        { title: '我的订单', key: 'order' },
         { title: '优惠券', key: '' },
         { title: '礼品卡', key: '' },
         { title: '评价晒单', key: '' },
@@ -44,7 +48,6 @@ export default defineComponent({
         collectionList,
         helpList
       }
-
     }
 
     const { accountList, payManagerList, collectionList, helpList } = list()
@@ -56,16 +59,19 @@ export default defineComponent({
       { title: '帮助中心', key: 'help', children: helpList },
     ])
 
-    const onClick = () => { }
+    const onClick = (row: any) => {
+      router.push(`/${row.key}`)
+    }
 
     return {
       onClick,
       menuItems,
+      route,
     }
   },
 
   render() {
-    const { onClick, menuItems } = this
+    const { onClick, menuItems, route } = this
     return (
       <>
         <HeaderComponent />
@@ -82,7 +88,13 @@ export default defineComponent({
                   <h4 class={`fs18 f400 pt30 pl52 pb15 menuTitle`}>{item.title}</h4>
 
                   {item.children && item.children.map(key => {
-                    return <Menu.Item title={key.title} key={key.key}>{key.title}</Menu.Item>
+                    return <Menu.Item
+                      title={key.title}
+                      key={key.key}
+                      class={route.path === '/' + key.key ? 'ant-menu-item-selected' : ''}
+                    >
+                      {key.title}
+                    </Menu.Item>
                   })}
                 </div>
               })}
